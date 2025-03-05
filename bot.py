@@ -1,20 +1,22 @@
 import feedparser
 import requests
 import time
+import os
 
-# Configurazione
-TELEGRAM_BOT_TOKEN = "7829474341:AAG4xOxcjrsuJytIj-zT1CNUg_9riLvANnk"
-CHAT_ID = "214258536"
-RSS_FEED_URL = "https://corrierealpi.gelocal.it/belluno/rss/copertina.xml"  # Sostituiscilo con un feed reale
+# Legge le variabili d'ambiente da Railway
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # Token del bot Telegram
+CHAT_ID = os.getenv("CHAT_ID")  # ID della chat Telegram
+RSS_FEED_URL = os.getenv("RSS_FEED_URL")  # URL del feed RSS da monitorare
 
-# Funzione per inviare messaggi a Telegram
+# Controllo degli RSS
+last_entry = None
+
 def send_telegram_message(text):
+    """Invia un messaggio alla chat Telegram configurata"""
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     data = {"chat_id": CHAT_ID, "text": text}
     requests.post(url, data=data)
 
-# Controllo degli RSS
-last_entry = None
 while True:
     feed = feedparser.parse(RSS_FEED_URL)
     if feed.entries:
