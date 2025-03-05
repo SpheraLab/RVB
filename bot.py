@@ -32,4 +32,24 @@ def send_telegram_message(text):
     if response.status_code == 200:
         print("✅ Messaggio inviato con successo!")
     else:
-        print(f"⚠️ Errore nell'invio
+        print(f"⚠️ Errore nell'invio del messaggio: {response.text}")
+
+# Variabile per tenere traccia dell'ultimo articolo inviato
+last_entry = None
+
+# Loop per controllare gli RSS
+while True:
+    print("🔄 Controllo nuovi articoli...")
+    feed = feedparser.parse(RSS_FEED_URL)
+
+    if not feed.entries:
+        print("⚠️ Nessun articolo trovato nel feed!")
+    else:
+        latest_entry = feed.entries[0]  # Prende l'ultimo articolo pubblicato
+        if last_entry is None or latest_entry.link != last_entry:
+            message = f"📢 Nuovo articolo: {latest_entry.title}\n{latest_entry.link}"
+            send_telegram_message(message)
+            last_entry = latest_entry.link
+
+    print("⏳ Aspetto 60 secondi prima del prossimo controllo...")
+    time.sleep(60)
